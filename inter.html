@@ -1,0 +1,194 @@
+<!-- Cosmo Rover code  -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESP32 WebSocket Interface</title>
+    <!--<link  href="style.css"  rel="stylesheet" type="text/css">-->
+    <link href="test.css" rel="stylesheet" type="text/css">
+
+</head>
+<body>
+    <h1>CoSmO RoVeR Controller</h1>
+  
+  <div>
+  <button id="toggleButton">Start Stream</button>
+  </div>
+
+  <canvas id="canvas"></canvas>
+  
+  <script>
+    const canvas = document.getElementById('canvas');
+    const context = canvas.getContext('2d');
+    const toggleButton = document.getElementById('toggleButton');
+    const frameWidth = 320;  // Match the ESP32-CAM frame size
+    const frameHeight = 240;
+    
+    let isStreaming = false;
+    let ws;
+
+    // Set canvas dimensions
+    canvas.width = frameWidth;
+    canvas.height = frameHeight;
+  
+    /* Function for jpeg*/
+    function startStreaming() {
+     ws = new WebSocket('ws://192.168.123.183:81'); //192.168.29.143 home ip //192.168.123.183 phone ip
+     ws.binaryType = 'arraybuffer';
+
+    ws.onopen = () => {
+    console.log('Connected to WebSocket server');
+    ws.send('start');  // Request streaming start
+    isStreaming = true;
+    toggleButton.innerText = 'Stop Stream';
+    };
+
+  ws.onmessage = (event) => {
+    // Create a blob from the binary data received
+    const blob = new Blob([event.data], { type: 'image/jpeg' });
+    const url = URL.createObjectURL(blob);
+    
+    // Create an image element to display the JPEG image
+    const img = new Image();
+    img.onload = () => {
+      context.clearRect(0, 0, canvas.width, canvas.height);  // Clear the canvas
+      context.drawImage(img, 0, 0);  // Draw the image on the canvas
+      URL.revokeObjectURL(url);  // Clean up the URL object
+    };
+    img.src = url;  // Set the source of the image
+  };
+
+  ws.onclose = () => {
+    console.log('WebSocket connection closed');
+  };
+  }
+
+
+    ////function for RGB565 
+
+    // Function to connect to WebSocket and handle streaming
+    // function startStreaming() {
+    //   ws = new WebSocket('ws://192.168.89.159:81');
+    //   ws.binaryType = 'arraybuffer';
+
+    //   ws.onopen = () => {
+    //     console.log('Connected to WebSocket server');
+    //     ws.send('start');  // Request streaming start
+    //     isStreaming = true;
+    //     toggleButton.innerText = 'Stop Stream';
+    //   };
+
+    //   ws.onmessage = (event) => {
+    //     const frameData = new Uint8Array(event.data);
+    //     const imageData = context.createImageData(frameWidth, frameHeight);
+
+    //     // Decode RGB565 to RGB888 and draw to the canvas
+    //     for (let i = 0, j = 0; i < frameData.length; i += 2, j += 4) {
+    //       const rgb565 = (frameData[i] << 8) | frameData[i + 1];
+          
+    //       const r = ((rgb565 >> 11) & 0x1F) * 255 / 31;
+    //       const g = ((rgb565 >> 5) & 0x3F) * 255 / 63;
+    //       const b = (rgb565 & 0x1F) * 255 / 31;
+
+    //       imageData.data[j] = r;
+    //       imageData.data[j + 1] = g;
+    //       imageData.data[j + 2] = b;
+    //       imageData.data[j + 3] = 255;
+    //     }
+
+    //     context.putImageData(imageData, 0, 0);
+    //   };
+
+    //   ws.onclose = () => {
+    //     console.log('WebSocket connection closed');
+    //   };
+    // }
+
+    // Function to stop streaming
+    function stopStreaming() {
+      if (ws) {
+        ws.send('stop');  // Signal to stop streaming
+        ws.close();  // Close WebSocket connection
+      }
+      isStreaming = false;
+      toggleButton.innerText = 'Start Stream';
+      context.clearRect(0, 0, canvas.width, canvas.height);  // Clear canvas
+    }
+
+    // Toggle button event listener
+    toggleButton.addEventListener('click', () => {
+      if (isStreaming) {
+        stopStreaming();
+      } else {
+        startStreaming();
+      }
+    });
+  </script>
+    <div id="joystick-container">
+        <div id="joystick"></div>
+    </div>
+    
+    <div id="sensorData">
+      <h2>
+         SENSOR DATA
+      </h2>
+        <p>Temperature: <span id="temperature">N/A</span> °C</p>
+        <p>Humidity: <span id="humidity">N/A</span> %</p>
+        
+    </div>
+
+<div id="radar2">  
+    <h1> RADAR </h1>
+    
+    <p>Nearest Obstacles: <span id="obs">N/A</span> cm</p>
+    <p>Angle: <span id="pos">N/A</span> °</p>
+    <div id ="radar"><canvas id="radarCanvas"></canvas>
+
+</div>
+  
+</div>
+    <!-- <input type="text" id="commandInput" placeholder="Send command to ESP32">
+    <button onclick="sendCommand()">Send Command</button> -->
+   <h2>
+       ARM CONTROLS
+   </h2>
+<!-- 9 -->
+    <div class="slider-container">
+        <h3>Claw Slider 1: <span id="value1">30</span></h3>
+        <input style="width: 300px;" type="range" id="slider1" min="0" max="60" value="30" oninput="updateAndSend(1)">
+    </div>
+
+    <div class="slider-container">
+        <h3>Wrist y Slider 2: <span id="value2">90</span></h3>
+        <input type="range" id="slider2" min="20" max="160" value="90" oninput="updateAndSend(2)">
+    </div>
+
+    <div class="slider-container">
+        <h3>Wrist x Slider 3: <span id="value3">90</span></h3>
+        <input type="range" id="slider3" min="0" max="180" value="90" oninput="updateAndSend(3)">
+    </div>
+
+    <div class="slider-container">
+        <h3>Elbow Slider 4: <span id="value4">90</span></h3>
+        <input type="range" id="slider4" min="0" max="146" value="90" oninput="updateAndSend(4)">
+    </div>
+
+    <div class="slider-container">
+      <h3>Shoulder Slider 5: <span id="value5">90</span></h3>
+      <input type="range" id="slider5" min="0" max="180" value="90" oninput="updateAndSend(5)">
+    </div>
+  
+    <div class="slider-container">
+      <h3>Base Slider 6: <span id="value6">90</span></h3>
+      <input type="range" id="slider6" min="0" max="180" value="90" oninput="updateAndSend(6)">
+    </div>
+
+    <!-- Sliders and Other Controls -->
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/nipplejs/0.8.3/nipplejs.min.js"></script>
+    <script src="n.js"></script>  
+    </script>
+
+</body>
+</html>

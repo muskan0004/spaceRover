@@ -1,0 +1,120 @@
+/* General Body and Button Styles */
+body {
+    
+    font-family: Arial, sans-serif;
+    text-align: center;
+    margin-top: 50px;
+}
+
+#sensorData {
+    font-size: 20px;
+    margin-bottom: 20px;
+    border: 1px solid #000;
+}
+
+input[type="text"] {
+    padding: 10px;
+    width: 300px;
+    margin-top: 20px;
+}
+
+button {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+.slider-container {
+    margin: 20px 0;
+}
+
+input[type="range"] {
+    width: 300px;
+   /*  -webkit-appearance: none; */
+    height: 8px;
+    background: #555;
+    border-radius: 5px;
+}
+#canvas {
+    border: 1px solid #000;
+    width: 320px;
+    height: 240px;
+}
+
+/* Joystick Styles */
+#joystick-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px 0;
+}
+
+#joystick {
+    width: 30vw;
+    height: 30vw;
+    max-width: 150px;
+    max-height: 150px;
+    border: 2px solid #333;
+    border-radius: 50%;
+    position: relative;
+}
+#radar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 50%
+  
+}
+#radarCanvas {
+    background-color: #1A1A1A;
+    border: 2px solid #4CAF50;
+    box-shadow: 0px 0px 10px rgba(76, 175, 80, 0.5);
+    width:50%;
+    height: 100%;
+    display: block;
+}
+
+/*.nipple {
+    background-color: rgb(178, 178, 187); /* Joystick color 
+    /width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+} */
+
+/* Responsive Adjustment for Smaller Screens */
+@media (max-width: 768px) {
+    body {
+        margin-top: 20px;
+    }
+
+    #sensorData {
+        font-size: 1.1em;
+    }
+    input[type="text"],
+    input[type="range"] {
+        width: 80%;
+    }
+
+    #joystick {
+        width: 30vw; /* Smaller joystick for smaller screens */
+        height: 40vw;
+        width: 150px;
+        height: 150px;
+    }
+
+    .nipple {
+        width: 50px;
+        height: 50px;
+    }
+
+}
