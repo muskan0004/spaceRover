@@ -3,10 +3,3 @@ A simple web interface to control a space rover.
 along with camera moduling 
 
 
-#Files
-
--inter.html – UI for rover control.
-
--rover.js – Handles commands.
-
--styles.css – UI styling
